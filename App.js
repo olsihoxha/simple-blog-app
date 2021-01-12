@@ -1,21 +1,48 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React,{useState} from 'react';
+import {View,StatusBar} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createSharedElementStackNavigator} from 'react-navigation-shared-element';
+import DetailsScreen from './components/Details';
+import Header from './components/Header';
+import Body from './components/Body';
+
+
+
+const Stack = createSharedElementStackNavigator();
+
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <NavigationContainer>
+       <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Feed" component={Feed} />
+        <Stack.Screen
+        sharedElementsConfig={(route,otherRoute,showing)=>{
+          const {item} = route.params;
+          return[
+              {id:`item.${item.id}.image`},
+          ];
+        }}
+        name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+
+const Feed=({navigation })=>{
+  const [isDark,setIsDark]=useState(false);
+  return(
+  <View style={{flex:1}}>
+    <StatusBar backgroundColor={'#AAB7B8'} />
+    <Header setIsDark={setIsDark}/>
+    <Body navigation={navigation} isDark={isDark} style={{flex:1}}/>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+
+
+
+
+
