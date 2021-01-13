@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import {View,StatusBar} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createSharedElementStackNavigator} from 'react-navigation-shared-element';
@@ -12,6 +12,9 @@ const Stack = createSharedElementStackNavigator();
 
 
 export default function App() {
+
+  
+
   return (
     <NavigationContainer>
        <Stack.Navigator screenOptions={{headerShown: false}}>

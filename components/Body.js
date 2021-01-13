@@ -1,42 +1,85 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import { StyleSheet, Text, View,Image,Dimensions,StatusBar,FlatList, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { SharedElement } from 'react-navigation-shared-element';
 
 
-const data=[
-    {
-      id:'1',
-      title:'The movies tonight were super fun',
-      image:'https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=925&q=80',
-      desc:'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
-    },
-    {
-      id:'2',
-      title:'Another Movie',
-      image:'https://images.unsplash.com/photo-1485846234645-a62644f84728?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1340&q=80',
-      desc:'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
-    },
-    {
-      id:'3',
-      title:'Third Movie',
-      image:'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      desc:'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
-    }
-  ]
-  
+  String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+
+function convertHTML(str) {
+  //those are some of the html Entities (the list goes on but for testing pourposes it works fine)
+  return str.replace(/&/g,"&amp;")
+    .replace(/&lt;/g,"<")
+    .replace(/&gt;/g,">")
+    .replace(/&quot;/g,"\"")
+    .replace(/&#8217;/g,"'")
+    .replace(/&amp;nbsp;/g," ")
+    .replace(/&nbsp;/g," ")
+    .replace(/&amp;/g,"&")
+    .replace(/&euro;/g,"€")
+    .replace(/&pound;/g,"£");
+    
+}
+
+
 const {width}=Dimensions.get('screen');
+
+
 //Body of the Feed
 const Body=({isDark,navigation})=>{
+
+  const[allNews,setAllNews]=useState([]);
+
+  useEffect(() => {
+    (async function f(){
+      const response = await fetch("https://gotanews.tv/wp-json/wp/v2/posts?_embed&page=1");
+      const data = await response.json();
+//jetpack_featured_media_url
+      let allNewsToSet=[];
+      
+      for(let index=0;index<6;index++){
+        const id=data[index]['id'];
+       
+        const thenews=data[index]['content']['rendered'];
+        thenews = thenews.replace(/<(.|\n)*?>/g, '');
+        thenews = thenews.replaceAll("&#8217;","'");
+        thenews =convertHTML(thenews);
+
+        const theTitle=data[index]['title']['rendered'];
+        theTitle=convertHTML(theTitle);
+        theTitle = theTitle.replaceAll("&#8217;","'");
+        
+        const theImage=data[index]['jetpack_featured_media_url'];
+       
+        let theItem={
+          id,
+          title:theTitle,
+          image:theImage,
+          desc:thenews
+        }
+        //this is to strip out all the html-tags with a regular expression
+        
+        allNewsToSet=[...allNewsToSet,theItem];
+      }
+      setAllNews(allNewsToSet);
+
+        
+    })();
+   
+  }, [])
+
     return(
       <View style={{flex:1,backgroundColor:isDark?'black':'white'}}>
      <FlatList
-     keyExtractor={item=>item.id}
-     data={data}
+     keyExtractor={item=>(item.id).toString()}
+     data={allNews}
      renderItem={({item})=>{
         return(
           <View style={styles.bodyItemContainer}>
-            
             <SharedElement id={`item.${item.id}.image`}>
             <Image
             resizeMode='cover'

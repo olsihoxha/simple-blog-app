@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import { StyleSheet, Text, View,Image,Switch,Dimensions} from 'react-native';
+import { StyleSheet, Text, View,Image,Switch,Dimensions,} from 'react-native';
 
 const {width}=Dimensions.get('screen');
 //Header of the Feed

@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View,Image,Dimensions,StatusBar,Linking,Alert} from 'react-native';
 import {SharedElement } from 'react-navigation-shared-element';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 const {width}=Dimensions.get('screen');
@@ -10,6 +11,7 @@ const DetailsScreen=({ route })=>{
     const {item,isDark}=route.params;
     return(
       <>
+      <ScrollView>
       <StatusBar backgroundColor={'#AAB7B8'} />
         <View style={{flex:1,backgroundColor:isDark?'black':'white'}}>     
           <Text style={{
@@ -42,8 +44,10 @@ const DetailsScreen=({ route })=>{
             </View>
 
           </View>
-          <Text style={{color:isDark?'white':'black',}}>{item.desc}</Text>
+          
+          <Text style={{color:isDark?'white':'black',marginHorizontal:20}}>{item.desc}</Text>
         </View>
+        </ScrollView>
         </>
     );
   }
